@@ -12,14 +12,21 @@ mailPort = 587
 #Fill in start
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.settimeout(10)
+clientSocket.connect((mailServer, mailPort))
+print(clientSocket.recv(1024))
+
+clientSocket.send(b'EHLO smtp.google.com.\r\n')
+recv = clientSocket.recv(1024)
+
+clientSocket.send(b'STARTTLS\r\n')
+print(clientSocket.recv(1024))
 
 ## WRAP SOCKET
-clientSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_TLSv1_2, ciphers="AES256-SHA")
-clientSocket.connect((mailServer, mailPort))
+clientSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_SSLv23)
 #Fill in end
 
-recv = clientSocket.recv(1024).decode()
-print(recv)
+#recv = clientSocket.recv(1024).decode()
+#print(recv)
 
 if recv[:3] != '220':
 
