@@ -1,5 +1,7 @@
 from socket import *
+import base64
 import ssl
+import getpass
 
 msg = "\r\n I love computer networks!"
 endmsg = "\r\n.\r\n"
@@ -11,8 +13,6 @@ mailPort = 587
 # Create socket called clientSocket and establish a TCP connection with mailserver
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.settimeout(10)
-<<<<<<< HEAD
-<<<<<<< HEAD
 clientSocket.connect((mailServer, mailPort))
 recv = clientSocket.recv(1024)
 
@@ -26,6 +26,8 @@ print()
 clientSocket.send(b'EHLO smtp.google.com.\r\n')
 recv1 = clientSocket.recv(1024)
 print("After EHLO command: ", recv1)
+if recv1[:3] != b'250':
+	 print('250 reply not received from server.')
 print()
 
 #start a TLS connection
@@ -33,30 +35,25 @@ clientSocket.send(b'STARTTLS\r\n')
 recv2 = clientSocket.recv(1024)
 print("After STARTTLS: ", recv2)
 print()
-=======
->>>>>>> parent of 6155329... client makes SSL connection with server. Needs auth command
-=======
->>>>>>> parent of 6155329... client makes SSL connection with server. Needs auth command
 
 ## WRAP SOCKET
 clientSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_TLSv1_2, ciphers="AES256-SHA")
-clientSocket.connect((mailServer, mailPort))
 #Fill in end
 
-recv = clientSocket.recv(1024).decode()
-print(recv)
+## AUTHENTICATION
+userName = input("Insert username: ")
+password = getpass.getpass(prompt= "Insert password: ")
 
+clientSocket.send(('auth login\r\n').encode())
+recv3 = clientSocket.recv(1024).decode()
+print("After AUTH LOGIN: ", recv3)
 
-# Send HELO command and print server response.
-heloCommand = 'HELO Alice\r\n'
-clientSocket.send(heloCommand.encode())
-recv1 = clientSocket.recv(1024).decode()
-print(recv1)
+clientSocket.send((base64.b64encode((userName).encode())) + ('\r\n').encode())
+print(clientSocket.recv(1024).decode())
 
-if recv1[:3] != '250':
-	 print('250 reply not received from server.')
+clientSocket.send((base64.b64encode((password).encode())) + ('\r\n').encode())
+print(clientSocket.recv(1024).decode())
 
-# Send MAIL FROM command and print server response.
 # Fill in start
 mailFrom = "MAIL FROM: luismomm@gmail.com\r\n"
 clientSocket.send(mailFrom.encode())
