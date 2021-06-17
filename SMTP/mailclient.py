@@ -9,17 +9,28 @@ mailServer = 'smtp.gmail.com'
 mailPort = 587
 
 # Create socket called clientSocket and establish a TCP connection with mailserver
-#Fill in start
 clientSocket = socket(AF_INET, SOCK_STREAM)
 clientSocket.settimeout(10)
 clientSocket.connect((mailServer, mailPort))
-print(clientSocket.recv(1024))
-
-clientSocket.send(b'EHLO smtp.google.com.\r\n')
 recv = clientSocket.recv(1024)
 
+print("After socket tries to connect: ", recv)
+if recv[:3] != b'220':
+
+	print('220 reply not received from server.')
+print()
+
+#identify herself to the receiver
+clientSocket.send(b'EHLO smtp.google.com.\r\n')
+recv1 = clientSocket.recv(1024)
+print("After EHLO command: ", recv1)
+print()
+
+#start a TLS connection
 clientSocket.send(b'STARTTLS\r\n')
-print(clientSocket.recv(1024))
+recv2 = clientSocket.recv(1024)
+print("After STARTTLS: ", recv2)
+print()
 
 ## WRAP SOCKET
 clientSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_SSLv23)
@@ -28,9 +39,6 @@ clientSocket = ssl.wrap_socket(clientSocket, ssl_version=ssl.PROTOCOL_SSLv23)
 #recv = clientSocket.recv(1024).decode()
 #print(recv)
 
-if recv[:3] != '220':
-
-	print('220 reply not received from server.')
 
 # Send HELO command and print server response.
 heloCommand = 'HELO Alice\r\n'
