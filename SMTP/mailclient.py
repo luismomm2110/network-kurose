@@ -54,7 +54,8 @@ clientSocket.send((base64.b64encode((password).encode())) + ('\r\n').encode())
 print(clientSocket.recv(1024).decode())
 
 # Fill in start
-mailFrom = "MAIL FROM: luismomm@gmail.com\r\n"
+mailFrom = "MAIL FROM: <{}> \r\n".format(userName)
+print(mailFrom)
 clientSocket.send(mailFrom.encode())
 recv2 = clientSocket.recv(1024)
 recv2 = recv2.decode()
