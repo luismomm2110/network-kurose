@@ -5,19 +5,21 @@ if len(sys.argv) <= 1:
 	print('Usage : "python ProxyServer.py server_ip"\n server_ip : It is the IP Address Of Proxy Server')
 	sys.exit(2)
 # Create a server socket, bind it to a port and start listening
+
 tcpSerSock = socket(AF_INET, SOCK_STREAM)
-# Fill in start.
-# Fill in end.
+serverPort = 8888
+tcpSerSock.bind(('', serverPort))
+tcpSerSock.listen(1)
 while 1:
 	# Strat receiving data from the client
 	print('Ready to serve...')
 	tcpCliSock, addr = tcpSerSock.accept()
 	print('Received a connection from:', addr)
-	#message =
+	message = tcpCliSock.recv(1024).decode()
         # Fill in start. # Fill in end.
 	print(message)
 	# Extract the filename from the given message
-	print(message.split()[1])
+	print("Second part of message: ", message.split()[1])
 	filename = message.split()[1].partition("/")[2]
 	print(filename)
 	fileExist = "false"
