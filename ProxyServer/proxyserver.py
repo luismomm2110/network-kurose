@@ -21,10 +21,10 @@ while 1:
 	# Extract the filename from the given message
 	print("Second part of message: ", message.split()[1])
 	filename = message.split()[1].partition("/")[2]
-	print(filename)
+	print("File name: ", filename)
 	fileExist = "false"
 	filetouse = "/" + filename
-	print(filetouse)
+	print("File to use: ", filetouse)
 	try: 
 		# Check wether the file exist in the cache
 		f = open(filetouse[1:], "r")
@@ -34,21 +34,22 @@ while 1:
 		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
 		tcpCliSock.send("Content-Type:text/html\r\n")
 		# Fill in start.
+		tcpCliSock.send("outputdata")
 		# Fill in end.
-	##		print('Read from cache')
+		print('Read from cache')
 	# Error handling for file not found in cache
 	except IOError:
 		if fileExist == "false":
 			# Create a socket on the proxyserver
-			# c = # Fill in start. # Fill in end.
+			tcpProServer = socket(AF_INET, SOCK_STREAM)
 			hostn = filename.replace("www.","",1)
-			print(hostn) 
+			print("Print when fileExist == false :", hostn) 
 		try:
 			# Connect to the socket to port 80
 			# Fill in start.
 			# Fill in end.
 			# Create a temporary file on this socket and ask port 80 for the file requested by the client
-			fileobj = c.makefile('r', 0)
+			fileobj = tcpProServer.makefile('r', 0)
 			fileobj.write("GET "+"http://" + filename + "HTTP/1.0\n\n")
 		# Read the response into buffer
 		# Fill in start.
