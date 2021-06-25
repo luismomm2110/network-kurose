@@ -1,5 +1,6 @@
 from socket import *
 import sys
+import pdb
 
 if len(sys.argv) <= 1:
 	print('Usage : "python ProxyServer.py server_ip"\n server_ip : It is the IP Address Of Proxy Server')
@@ -17,7 +18,6 @@ while 1:
 	print('Received a connection from:', addr)
 	message = tcpCliSock.recv(1024).decode()
         # Fill in start. # Fill in end.
-	print(message)
 	# Extract the filename from the given message
 	print("Second part of message: ", message.split()[1])
 	filename = message.split()[1].partition("/")[2]
@@ -41,18 +41,22 @@ while 1:
 	except IOError:
 		if fileExist == "false":
 			# Create a socket on the proxyserver
-			tcpProServer = socket(AF_INET, SOCK_STREAM)
+			tcpProxyServer = socket(AF_INET, SOCK_STREAM)
 			hostn = filename.replace("www.","",1)
 			print("Print when fileExist == false :", hostn) 
 		try:
 			# Connect to the socket to port 80
 			# Fill in start.
+			tcpProxyServer.connect((hostn, 80))
+			print("Socket connected to port 80 in host")
 			# Fill in end.
 			# Create a temporary file on this socket and ask port 80 for the file requested by the client
-			fileobj = tcpProServer.makefile('r', 0)
+			fileobj = tcpProxyServer.makefile('wr', None)
 			fileobj.write("GET "+"http://" + filename + "HTTP/1.0\n\n")
+			print("fileobj: ", fileobj)
 		# Read the response into buffer
 		# Fill in start.
+
 		# Fill in end.
 		# Create a new file in the cache for the requested file.
 		# Also send the response in the buffer to client socket and the corresponding file in the cache
