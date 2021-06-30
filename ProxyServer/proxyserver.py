@@ -27,14 +27,17 @@ while 1:
 	print("File to use: ", filetouse)
 	try: 
 		# Check wether the file exist in the cache
+		import pdb; pdb.set_trace()
 		f = open(filetouse[1:], "r")
 		outputdata = f.readlines()
 		fileExist = "true"
 		# ProxyServer finds a cache hit and generates a response message
-		tcpCliSock.send("HTTP/1.0 200 OK\r\n")
-		tcpCliSock.send("Content-Type:text/html\r\n")
+		message = "HTTP/1.0 200 OK\r\n"
+		tcpCliSock.send(message.encode())
+		message = "Content-Type:text/html\r\n"
+		tcpCliSock.send(message.encode())
 		# Fill in start.
-		tcpCliSock.send("outputdata")
+		tcpCliSock.send(filetouse.encode())
 		# Fill in end.
 		print('Read from cache')
 	# Error handling for file not found in cache
@@ -51,16 +54,18 @@ while 1:
 			print("Socket connected to port 80 in host")
 			# Fill in end.
 			# Create a temporary file on this socket and ask port 80 for the file requested by the client
-			fileobj = tcpProxyServer.makefile('wr', None)
+			fileobj = tcpProxyServer.makefile('r', None)
 			fileobj.write("GET "+"http://" + filename + "HTTP/1.0\n\n")
 			print("fileobj: ", fileobj)
 		# Read the response into buffer
 		# Fill in start.
-
+			responseBuffer = fileobj.readlines()
 		# Fill in end.
 		# Create a new file in the cache for the requested file.
 		# Also send the response in the buffer to client socket and the corresponding file in the cache
 			tmpFile = open("./" + filename,"wb")
+			tmpFile.write(data)
+			tcpCliSock.send(data)
 		# Fill in start.
 		# Fill in end.
 		except:
@@ -68,9 +73,12 @@ while 1:
 		else:
 			# HTTP response message for file not found
 			# Fill in start.
+			tcpCliSock.send("HTTP/1.1 404 Not Found\r\n")
+			tcpCliSock.send("\r\n")
+			tcpCliSock.send("\r\n")
 			# Fill in end.
 		# Close the client and the server sockets
 			tcpCliSock.close()
-
+tcpSerSock.close()
 # Fill in start.
 # Fill in end.
