@@ -59,3 +59,16 @@ Entãp TCP faz da seguinte maneira. Tem um socket de entrada onde todos chegam. 
 Tem numero de base que avança conforme pacotes sao reconhecidos. Tem um limite N a partir da base para mandar pacoters nao reconhecidos. Senao manda tudo de novo. 
 
 Pacote n de sequencia [0, 2^k-1] 
+
+
+## Selective repeat
+
+GBN tem um problema quando a janela é grande, um único erro pode causar engarrafamento. 
+
+SR mantem o ACK dos enviados fora da ordem. O receptor então precisa manter buffered pacotes da sequencia fora da ordem. Daí quando recebe a base manda tudo de uma vez para camada superior. 
+
+Cada pacote tem seu prório timeout para nao manter nao precisar manndar todos, apenas os nao reconhecidos. 
+
+Há um problema para repetição quando o pode concidir numero de sequencia 
+
+
