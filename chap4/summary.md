@@ -92,12 +92,11 @@ Alguns tipos (dependendo da porta) recebe prioridade por classe que pertence (Ex
 
 Daí roteador manda sempre da primeira classe e dentro dela manda por FIFO.
 
+### Round Robin
 
+Faz por classe e daí vai rodando de classe...  como scheduler
 
+Agora por __WEIGTHTED FAIR QUEUING (WFD)__ cada classe tem peso e recebe tempos diferentes de serviço 
 
-
-
-
-
-
+Recebe porcentagem de tempo pela porcentagem de peso que ela tem, NO MÍNIMO
 
