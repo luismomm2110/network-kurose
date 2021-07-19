@@ -41,12 +41,37 @@ was received at 19:29:39.118249
 
 __RTT = 0.177522__
 
+The RTT for the  second package __0.179721000__
 
+Estimated RTT: __0.177796875__
 
+7) What is the length (header plus payload) of each of the first four data-carrying TCP segments?
 
+1514 bytes
 
+8) What is the minimum amount of available buffer space advertised to the client by gaia.cs.umass.edu among these first four data-carrying TCP segments?  Does the lack of receiver buffer space ever throttle the sender for these first four data-carrying segments?
 
+131328 (Calculated Windows Size) * 256 (Windows Scaling Factor)
 
+9) Are there any retransmitted segments in the trace file? What did you check for (in the trace) in order to answer this question?
+
+Both tcp.analysis.fast_retransmission and tcp.analysis.retransmission
+
+10) How much data does the receiver typically acknowledge in an ACK among the first ten data-carrying segments sent from the client to gaia.cs.umass.edu?  Can you identify cases where the receiver is ACKing every other received segment (see Table 3.2 in the text) among these first ten data-carrying segments?
+
+1400 bytes. Sometimes it ACKing 2  every other because of delayed ACK (RFC 5681)
+
+11) What is the throughput (bytes transferred per unit time) for the TCP connection?  Explain how you calculated this value.
+
+The FINACK recognizes 153064 bytes. Time between SYN and FINACK was 2.95s
+
+12) Use the Time-Sequence-Graph(Stevens) plotting tool to view the sequence number versus time plot of segments being sent from the client to the gaia.cs.umass.edu server.  Consider the “fleets” of packets sent around t = 0.025, t = 0.053, t = 0.082 and t = 0.1. Comment on whether this looks as if TCP is in its slow start phase, congestion avoidance phase or some other phase. Figure 6 shows a slightly different view of this data.
+
+The phase looks like slow start phase, as each "fleet" double its number of segments.
+
+13) These “fleets” of segments appear to have some periodicity. What can you say about the period?
+
+It's the RTT of the other fleet. 
 
 
 
