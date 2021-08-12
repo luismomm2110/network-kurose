@@ -191,7 +191,105 @@ Como é confiável, tem duas rateS: Lambda é _sending rate_ e depois da retrans
 
 1) Assumindo que A não sabe quando buffer lota, lambda nunca passa de R/2 para não haver timeout. Tudo é recebido 
 
-2) Assumindo que TEM CERTEZA que terá timeout para retransmitir. LAMBDA' = R/2 
+2) Assumindo que TEM CERTEZA que terá timeout para retransmitir. LAMBDA' = R/2  Recebida pela aplicacao em B é R/3 entao o buffer cheio faz parte da transmissão ser retransmission
 
+3) Se acontecer timeout antes do ACK voltar, ele vai mandar mesmo sem precisar. Entao vai ter transmissão original, retransmissão necessária, retransmissão desnecessária
+velocidade da aplicação vai pra R/4
+
+#### Cenario 3
+
+Todos com conexão confiável mesmo LAMBDA in e todos roteadores com capacidadde R
+
+A -> R1 -> R2 -> C
+D -> R4 -> R1 -> B
+
+Para valores pequenos de output, nao sobrecarrega o buffer. Aumento de LAMBDA in aumenta de LAMBDA out
+
+Agora considere o caso que Lambda In e LAMNDA' in é bastante grande. 
+
+A chegada em R2 é no máximo R, a transmissao entre R1 e R2. Mas B-D usa R2 diretamente, se ele mandar mto, A-C não vai ter espaço em R2. Lambda out vai para zero
+
+Isso significa que o trabalho de R1 PARA R2 foi desperdiçado 
+
+## Maneiras de controle de congestão 
+
+Controle por end-to-end: TCP sem apoio do IP. Com timeout ou recepção de tres ACK
+
+Com assitencia da rede indicando tráfego para um link ou congestao. Pode mandar um pacote ou mais tipicamente colocando um campo no segmento para o recpetor perceber
+a congestão e mandar pro enviante 
+
+## TCP controle de congestão 
+
+### Classico 
+
+Limitar ou aumentar conforme tráfego na rede 
+
+Como limita? 
+
+_LastByteSent - LastByteACK <= min(cwd, rwnmd)_ __congestion and receive window__
+
+Primeiro imagine que rwnd é infinito, buffer infitino de recepção, sem perda de pacote... então só cwnd faz diferença 
+
+Vamos imaginar um envio: ele está no LastByteAck 2... se cwd é 5, ele só pode mandar 3 ... ele manda 3, recebe 3 ack no fim em RTT segundos, logo a velocidade dele 
+é __cwnd/RTT__
+
+Como TCP percebe a perda de pacote: timeout ou 3 ACK... isso ocorre, por exemplo, quando há overflow em algum buffer do roteador
+
+TCP usa então um relógio para perceber se o tempo entre ACK é lento, isso determina o cwdn 
+
+Então como determinar? as questões principais são: nao pode sobrecarregar nem subutilizar. 
+
+	- uma maneira de detectar é com segmento perdido como nas partes acima. timeout ou 4 ack. Dái ele ajuda a janela de congestão e portanto a taxa
+
+	- quando recebe, indica que tá tudo bem. CWND pode aumentar 
+
+	- Estratégia do TCP: aumenta a cada ACK mas quando tem um drop ele volta pra velocidade inicial 
+
+#### Mecanismos 
+
+1) Slow start: Começa com 1 MSS (__maximo segumento suportado pélo sender__), então a taxa inicial é MSS/RTT; Cada ACK recebido aumenta em um MSS a mais no CWND, 
+então cresce exponencialmente. Acava quando tem uma perda (timeout ou 3 ACK) daí seta cwnd para 1 para recomeçar slow star. E seta nova variável (ssthresh slow start threshold) que chega é metade da cwnd quando teve congestão. depois do timeout, quando cwnd alcanda ssthresh começa modo de congestão e aceleração é menor. 
+
+2) Congestion avoidance: quando está nesse modo, aumenta apenas 1 MSS por RTT. E quando acaba? Cwnd começar sempre em 1 MSS e o valor de sshresth também é metade do cwnd. Quanmdo há tres ACK duplicados TCP faz cwnd pela metade e sshtresh pela metade do cwnd quando teve tres ACK. Entra em fast recovery. 
+
+3) Fast recovery: valor do CWND é incrementado em 1 MMS para cada ACK duplicado do segmento que causou o TCP entrar em fast recovery. Se ocorre timeout, volta para Slow Start. 
+
+Isso mostra como TCP vai testando a banda. Primeiro cresce até ser limitada por ela e retorna crescimento e assim por diante. 
+
+#### TCP Cubic
+
+Esse algoritmo anterior pode ser mto conservador. Por isso, TCP Cubic usa Congestion avoidance diferente
+
+ - Wmax indica tamanho da janela de congestão quando teve perda, K éo  tempo que irá alcançar 
+
+ - A janela de congestão cresce ao cubo da distância entre tempo atual e K. Ou seja cresce rápido longe e lento perto
+
+ ### Análise 
+
+ A velocidade varia de W/RTT (alcance máximo) para W/2*RTT quando tem timneout 
+
+ velocidade média então é 0.75W/RTT
+
+ ## Congestão com auxílio da Rede e baseada em Delay
+
+ ### ECN : Explicit congestion notification
+
+ Usa dois bits no datagrama
+  - Um para indicar que tem congestão, daí o receptor envia ao emitente (por isso precisa ser antes do timeout)
+  - outro para indicar que essa conexão permite ECN
+
+ O ACK do receptor manda esse arquivo de congestão, o que permite o rementente simular um timeout e cortar cwnd no meio 
+
+ ### Delay based congestion control 
+
+ O ideal é ocorrer antes do timeout para não haver perda de pacote no buffer (desperdíco)
+
+ TCL Vegas usa vendo o RTT do maus rápido pacote. Se há outro com velocidade mto menor que a dessa ele já percebe o delay 
+
+ ## Fairness
+
+ Uma conexão é fair quando velocidade de cada conexão é R/K sendo R a taxa de transmissão do bottleneck e K n de conexões
+ 
+   
 
 
